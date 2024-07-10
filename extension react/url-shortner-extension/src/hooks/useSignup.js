@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { backendURL } from "../constants";
-import { useAuthContext } from "./useAuthContext";
-import { useNavigate } from "react-router-dom";
 
 export const useSignup = () => {
   const [error, setError] = useState({ code: null, error: null });
   const [loading, setLoading] = useState(false);
-  const { dispatch } = useAuthContext();
-  const navigate = useNavigate();
+
+  const [showOTPComponent, setshowOTPComponent] = useState(false);
 
   const signup = async (name, email, password, confirmPassword) => {
     setLoading(true);
@@ -32,13 +30,11 @@ export const useSignup = () => {
       setError({ code: resp.ok, error: data.resp });
       setLoading(false);
     }
+
     if (resp.ok) {
-      setError({ code: resp.ok, error: data.resp });
-      setLoading(false);
-      localStorage.setItem("user", data.token);
-      dispatch({ type: "LOGIN", payload: data });
-      navigate("/");
+      console.log("email is legit");
+      setshowOTPComponent(true);
     }
   };
-  return { signup, error, loading };
+  return { signup, error, loading, showOTPComponent };
 };

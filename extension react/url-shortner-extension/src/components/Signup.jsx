@@ -15,6 +15,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSignup } from "../hooks/useSignup";
+import VerifyEmailForm from "./VerifyOTP";
 
 const Signup = () => {
   const email = useRef(null);
@@ -27,7 +28,7 @@ const Signup = () => {
   const locaton = useLocation();
   console.log("url " + locaton);
 
-  const { signup, error, loading } = useSignup();
+  const { signup, error, loading, showOTPComponent } = useSignup();
 
   useEffect(() => {
     if (error) {
@@ -59,7 +60,9 @@ const Signup = () => {
     }
   };
 
-  return (
+  return showOTPComponent ? (
+    <VerifyEmailForm email={email?.current?.value} />
+  ) : (
     <Flex alignItems="center" justifyContent="center" minH="100vh">
       <Stack
         style={{ border: "1px solid black" }}

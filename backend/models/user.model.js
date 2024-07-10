@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema(
     profileImageURL: {
       type: String,
     },
+    premiumUser: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

@@ -6,6 +6,7 @@ const requireAuth = require("../middleware/requireAuth");
 const router = express.Router();
 const Razorpay = require("razorpay");
 const Payment = require("../models/payment.model");
+const User = require("../models/user.model");
 const razorpayInstance = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
@@ -58,6 +59,7 @@ router.post("/verify", requireAuth, async (req, res) => {
       });
 
       await payment.save();
+      await User.findByIdAndUpdate(id, { isPremium: true });
 
       res.status(200).json({ message: "Payment successful" });
     }
@@ -65,10 +67,6 @@ router.post("/verify", requireAuth, async (req, res) => {
     console.log(err);
     res.status(500).json({ message: "Internal server error" });
   }
-});
-
-router.get("get-payment", (req, res) => {
-  res.json("Payment route");
 });
 
 module.exports = router;

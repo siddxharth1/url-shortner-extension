@@ -3,7 +3,7 @@ import { backendURL } from "../constants";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { Box, Button, Divider, Heading, Text } from "@chakra-ui/react";
 import URLsTable from "./URLsTable";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IoIosArrowBack } from "react-icons/io";
 
 const Profile = () => {
@@ -71,6 +71,10 @@ const Profile = () => {
           </Text>
           <Text as="h3" size="sm" my={2}>
             Total Links Created: {userData.numberOfUrlsCreated}
+          </Text>
+          <Text as="h3" size="sm" my={2}>
+            Premium: {userData.data.premiumUser ? "Yes" : "No"} -{" "}
+            <Link to="/premium"> Upgrade to Premium</Link>
           </Text>
         </Box>
       )}

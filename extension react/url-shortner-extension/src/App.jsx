@@ -1,17 +1,18 @@
 import "./App.css";
 import Main from "./components/Main";
 import { Navigate, Route, Routes } from "react-router-dom";
-import Login from "./components/Login";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Signup from "./components/Signup";
-import ForgotPassword from "./components/ForgotPassword";
 import Homepage from "./components/Homepage";
-import AnalyticsPage from "./components/AnalyticsPage";
 import { useAuthContext } from "./hooks/useAuthContext";
 import RedirectPage from "./components/RedirectPage";
-import Profile from "./components/Profile";
-import Navbar from "./components/Navbar";
-import PremiumPage from "./components/PremiumPage";
+import { lazy, Suspense } from "react";
+import Loading from "./components/Loading";
+
+const PremiumPage = lazy(() => import("./components/PremiumPage"));
+const Login = lazy(() => import("./components/Login"));
+const Signup = lazy(() => import("./components/Signup"));
+const ForgotPassword = lazy(() => import("./components/ForgotPassword"));
+const AnalyticsPage = lazy(() => import("./components/AnalyticsPage"));
+const Profile = lazy(() => import("./components/Profile"));
 
 function App() {
   const { user, isLoading } = useAuthContext();
@@ -28,14 +29,60 @@ function App() {
       <Routes>
         <Route path="/" element={user ? <Main /> : <Navigate to="/login" />}>
           <Route path="/" element={<Homepage />} />
-          <Route path="/analytics/:id" element={<AnalyticsPage />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route
+            path="/analytics/:id"
+            element={
+              <Suspense fallback={<Loading />}>
+                <AnalyticsPage />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <Suspense fallback={<Loading />}>
+                <Profile />
+              </Suspense>
+            }
+          />
         </Route>
         {/* <Main /> */}
-        <Route path="login" element={!user ? <Login /> : <Navigate to="/" />} />
-        <Route path="signup" element={<Signup />} />
-        <Route path="forgotpassword" element={<ForgotPassword />} />
-        <Route path="/premium" element={<PremiumPage />} />
+        <Route
+          path="login"
+          element={
+            !user ? (
+              <Suspense fallback={<Loading />}>
+                <Login />
+              </Suspense>
+            ) : (
+              <Navigate to="/" />
+            )
+          }
+        />
+        <Route
+          path="signup"
+          element={
+            <Suspense fallback={<Loading />}>
+              <Signup />
+            </Suspense>
+          }
+        />
+        <Route
+          path="forgotpassword"
+          element={
+            <Suspense fallback={<Loading />}>
+              <ForgotPassword />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/premium"
+          element={
+            <Suspense fallback={<Loading />}>
+              <PremiumPage />
+            </Suspense>
+          }
+        />
         <Route path="/:id" element={<RedirectPage />} />
       </Routes>
     </div>

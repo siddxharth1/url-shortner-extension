@@ -77,70 +77,106 @@ const AnalyticsPage = () => {
   }
 
   return (
-    <Box mt={1} px={"5vw"}>
-      <Button onClick={() => navigate(-1)}>
-        <IoIosArrowBack />
+    <Box mt={4} px={{ base: "4", md: "5vw" }} py={4}>
+      <Button
+        onClick={() => navigate(-1)}
+        mb={4}
+        variant="outline"
+        leftIcon={<IoIosArrowBack />}
+      >
+        Back
       </Button>
 
-      <Heading size="lg">Analytics</Heading>
+      <Heading size="lg" mb={6}>
+        Analytics
+      </Heading>
 
-      <Box>
+      <Box mb={6}>
         <Text>
-          Original URL: <Link>{analytics.resp.originalURL}</Link>
+          Original URL:{" "}
+          <Link color="teal.500" href={analytics.resp.originalURL} isExternal>
+            {analytics.resp.originalURL}
+          </Link>
         </Text>
         <Text>
-          Short URL: <Link> {frontendURL + "/" + analytics.resp.shortURL}</Link>
+          Short URL:{" "}
+          <Link
+            color="teal.500"
+            href={`${frontendURL}/${analytics.resp.shortURL}`}
+            isExternal
+          >
+            {frontendURL}/{analytics.resp.shortURL}
+          </Link>
         </Text>
-        <Text>Created on: {analytics.resp.createdAt.split("T")[0]}</Text>
+        <Text>
+          Created on: {new Date(analytics.resp.createdAt).toLocaleDateString()}
+        </Text>
         <Text>Total Visit Count: {analytics.resp.visitHistory.length}</Text>
       </Box>
 
-      <Flex>
-        <Box mt={5}>
-          <Heading size="md">Visits by State</Heading>
-          <Stack>
-            <Bar
-              data={{
-                labels: chartData.visitsByState.map((item) => item.state),
-                datasets: [
-                  {
-                    label: "Visits",
-                    data: chartData.visitsByState.map((item) => item.count),
-                  },
-                ],
-              }}
-            />
-          </Stack>
-          <Stack>
-            <Heading size="md">Visits by Date</Heading>
-            <Bar
-              data={{
-                labels: chartData.visitsByDate.map((item) => item.date),
-                datasets: [
-                  {
-                    label: "Visits",
-                    data: chartData.visitsByDate.map((item) => item.count),
-                  },
-                ],
-              }}
-            />
-          </Stack>
+      <Flex height={"30vh"} style={{ maxHeight: "500px" }} gap={6}>
+        <Box flex="1">
+          <Heading size="md" mb={4}>
+            Visits by State
+          </Heading>
+          <Bar
+            data={{
+              labels: chartData.visitsByState.map((item) => item.state),
+              datasets: [
+                {
+                  label: "Visits",
+                  data: chartData.visitsByState.map((item) => item.count),
+                  backgroundColor: "rgba(72, 187, 120, 0.2)",
+                  borderColor: "rgba(72, 187, 120, 1)",
+                  borderWidth: 1,
+                },
+              ],
+            }}
+            options={{ responsive: true, maintainAspectRatio: false }}
+          />
+        </Box>
 
-          <ComposableMap>
-            <Geographies
-              geography={
-                "https://raw.githubusercontent.com/lotusms/world-map-data/main/world.json"
-              }
-            >
-              {({ geographies }) =>
-                geographies.map((geo) => (
-                  <Geography key={geo.rsmKey} geography={geo} fill="#808080" />
-                ))
-              }
-            </Geographies>
-          </ComposableMap>
+        <Box flex="1">
+          <Heading size="md" mb={4}>
+            Visits by Date
+          </Heading>
+          <Bar
+            data={{
+              labels: chartData.visitsByDate.map((item) => item.date),
+              datasets: [
+                {
+                  label: "Visits",
+                  data: chartData.visitsByDate.map((item) => item.count),
+                  backgroundColor: "rgba(66, 153, 225, 0.2)",
+                  borderColor: "rgba(66, 153, 225, 1)",
+                  borderWidth: 1,
+                },
+              ],
+            }}
+            options={{ responsive: true, maintainAspectRatio: false }}
+          />
         </Box>
       </Flex>
+
+      <Box mt={10}>
+        <Heading size="md" mb={4}>
+          Geographical Distribution
+        </Heading>
+        <ComposableMap>
+          <Geographies geography="https://raw.githubusercontent.com/lotusms/world-map-data/main/world.json">
+            {({ geographies }) =>
+              geographies.map((geo) => (
+                <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  fill="#E2E8F0"
+                  stroke="#FFFFFF"
+                />
+              ))
+            }
+          </Geographies>
+        </ComposableMap>
+      </Box>
     </Box>
   );
 };
