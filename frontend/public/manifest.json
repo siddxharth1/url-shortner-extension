@@ -1,0 +1,11 @@
+{
+  "name": "URL Shortner",
+  "version": "0.0.1",
+  "manifest_version": 3,
+  "description": "save your url into its short version",
+  "action": {
+    "default_title": "URL Shortner",
+    "default_popup": "index.html"
+  },
+  "permissions": ["tabs", "activeTab"]
+}

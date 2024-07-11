@@ -4,16 +4,11 @@ const app = express();
 const cors = require("cors");
 
 app.use(
-  cors()
-  //   {
-  //   origin: function (origin, callback) {
-  //     if (origin === "http://localhost:5173") {
-  //       callback(null, true);
-  //     } else {
-  //       callback(new Error("Not allowed by CORS"));
-  //     }
-  //   },
-  // }
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
 );
 const requestIp = require("request-ip");
 app.use(
