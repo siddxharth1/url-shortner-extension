@@ -37,6 +37,9 @@ const userRoute = require("./routes/user.routes");
 const paymentRoute = require("./routes/payment.routes");
 const { handleGetRedirectURL } = require("./controllers/url.controller");
 
+app.get("/", (req, res) => {
+  res.json("hello");
+});
 app.use("/api/url", urlRoute);
 app.use("/user", userRoute);
 app.use("/api/payment", paymentRoute);
