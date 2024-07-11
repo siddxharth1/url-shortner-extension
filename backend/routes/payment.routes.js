@@ -59,7 +59,7 @@ router.post("/verify", requireAuth, async (req, res) => {
       });
 
       await payment.save();
-      await User.findByIdAndUpdate(id, { isPremium: true });
+      const data = await User.findByIdAndUpdate(id, { premiumUser: true });
 
       res.status(200).json({ message: "Payment successful" });
     }

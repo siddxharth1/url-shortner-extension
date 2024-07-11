@@ -1,5 +1,6 @@
 const { default: mongoose } = require("mongoose");
 const URL = require("../models/url.model");
+const User = require("../models/user.model");
 const requestIp = require("request-ip");
 require("dotenv").config();
 
@@ -15,7 +16,11 @@ const handleCreateURL = async (req, res) => {
     createdBy: req.user._id,
   }).countDocuments();
 
-  if (numberOfUrlsCreated >= 5) {
+  const userPremiumStatus = await User.findById(req.user._id).select(
+    "premiumUser"
+  );
+
+  if (numberOfUrlsCreated >= 5 && !userPremiumStatus.premiumUser) {
     return res.status(400).json({
       resp: "You have reached the maximum number of urls that can be created for free",
       numberOfUrlsCreated,
@@ -57,18 +62,18 @@ const handleDeleteURL = async (req, res) => {
 
 const handleGetRedirectURL = async (req, res) => {
   const { id } = req.params;
-  let clientIp = req.clientIp;
+  let clientIp = req.clientIp === "::1" ? "114.70.50.193" : req.clientIp;
   console.log(clientIp);
   let ipData = null;
 
   try {
     const response = await fetch(
-      `https://api.ipgeolocation.io/ipgeo?apiKey=${process.env.IPGEOLOCATION_API_KEY}&ip=${clientIp}`
+      `https://api.ipgeolocation.io/ipgeo?apiKey=${process.env.IPGEOLOCATION_API_KEY}&ip=114.70.50.193`
     );
     ipData = await response.json();
-    console.log(ipData);
+    // console.log(ipData);
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 
   // const url = await URL.findOne({ shortURL: id });
@@ -90,7 +95,7 @@ const handleGetRedirectURL = async (req, res) => {
     },
     { new: true }
   );
-  console.log(url);
+  // console.log(url);
   if (!url) {
     return res.status(404).json({ resp: "No such url found" });
   }

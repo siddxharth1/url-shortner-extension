@@ -73,8 +73,14 @@ const Profile = () => {
             Total Links Created: {userData.numberOfUrlsCreated}
           </Text>
           <Text as="h3" size="sm" my={2}>
-            Premium: {userData.data.premiumUser ? "Yes" : "No"} -{" "}
-            <Link to="/premium"> Upgrade to Premium</Link>
+            Premium:{" "}
+            {userData.data.premiumUser ? (
+              "Yes"
+            ) : (
+              <>
+                "No" - <Link to="/premium"> Upgrade to Premium</Link>
+              </>
+            )}
           </Text>
         </Box>
       )}

@@ -15,6 +15,9 @@ import { Chart as ChartJS } from "chart.js/auto";
 import { Bar, Line, Pie } from "react-chartjs-2";
 import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import { IoIosArrowBack } from "react-icons/io";
+import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import geoData from "./countries.geo.json";
 
 const groupData = (visitHistory) => {
   console.log(visitHistory);
@@ -43,15 +46,26 @@ const groupData = (visitHistory) => {
   return { visitsByState, visitsByDate };
 };
 
+const groupDataMap = (visitHistory) => {
+  const visitsByCountry = {};
+  visitHistory.forEach((visit) => {
+    const country = visit.location.country_name;
+    if (visitsByCountry[country]) {
+      visitsByCountry[country]++;
+    } else {
+      visitsByCountry[country] = 1;
+    }
+  });
+  return visitsByCountry;
+};
+
 const AnalyticsPage = () => {
   const [analytics, setAnalytics] = useState([]);
   const [chartData, setChartData] = useState({});
+  const [visitsByCountry, setVisitsByCountry] = useState({});
   const { id } = useParams();
   const { user } = useAuthContext();
   const navigate = useNavigate();
-
-  const locaton = useLocation();
-  console.log("url " + locaton);
 
   useEffect(() => {
     const getAnalytics = async (id) => {
@@ -65,6 +79,9 @@ const AnalyticsPage = () => {
 
       const groupedData = groupData(data.resp.visitHistory);
       setChartData(groupedData);
+
+      const groupedDataMap = groupDataMap(data.resp.visitHistory);
+      setVisitsByCountry(groupedDataMap);
       console.log(groupedData);
     };
     if (id) {
@@ -72,19 +89,67 @@ const AnalyticsPage = () => {
     }
   }, [id, user.token]);
 
+  const getColor = (count) => {
+    return count > 50
+      ? "#800026"
+      : count > 20
+      ? "#BD0026"
+      : count > 10
+      ? "#E31A1C"
+      : count > 5
+      ? "#FC4E2A"
+      : count > 2
+      ? "#FD8D3C"
+      : count > 1
+      ? "#FEB24C"
+      : count > 0
+      ? "#FED976"
+      : "#808080";
+  };
+
+  const style = (feature) => {
+    const country = feature.properties.name;
+    const count = visitsByCountry[country] || 0;
+    return {
+      fillColor: getColor(count),
+      weight: 1,
+      opacity: 1,
+      color: "white",
+      dashArray: "", // Remove the dashed border
+      fillOpacity: 0.7,
+    };
+  };
+
+  const onEachFeature = (feature, layer) => {
+    const country = feature.properties.name;
+    const count = visitsByCountry[country] || 0;
+    layer.bindTooltip(`${country}: ${count} clicks`);
+
+    // Add click event listener to change style on click
+    layer.on({
+      click: (e) => {
+        e.target.setStyle({
+          weight: 1,
+          color: "white",
+          dashArray: "", // Ensure the clicked feature style matches the default style
+        });
+      },
+    });
+  };
+
+  const bounds = [
+    [-90, -180],
+    [90, 180],
+  ];
+
   if (analytics.length === 0) {
     return <div>Loading...</div>;
   }
 
   return (
-    <Box mt={4} px={{ base: "4", md: "5vw" }} py={4}>
-      <Button
-        onClick={() => navigate(-1)}
-        mb={4}
-        variant="outline"
-        leftIcon={<IoIosArrowBack />}
-      >
-        Back
+    <Box mx="6vw">
+      <Button onClick={() => navigate(-1)}>
+        <IoIosArrowBack />
       </Button>
 
       <Heading size="lg" mb={6}>
@@ -162,20 +227,17 @@ const AnalyticsPage = () => {
         <Heading size="md" mb={4}>
           Geographical Distribution
         </Heading>
-        <ComposableMap>
-          <Geographies geography="https://raw.githubusercontent.com/lotusms/world-map-data/main/world.json">
-            {({ geographies }) =>
-              geographies.map((geo) => (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  fill="#E2E8F0"
-                  stroke="#FFFFFF"
-                />
-              ))
-            }
-          </Geographies>
-        </ComposableMap>
+        <MapContainer
+          center={[20, 0]}
+          zoom={2}
+          style={{ height: "500px", width: "100%" }}
+          maxBounds={bounds}
+          maxBoundsViscosity={1.0}
+          minZoom={2}
+        >
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <GeoJSON data={geoData} style={style} onEachFeature={onEachFeature} />
+        </MapContainer>
       </Box>
     </Box>
   );

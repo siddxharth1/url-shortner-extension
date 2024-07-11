@@ -27,6 +27,10 @@ const URLsTable = ({ urls, setUrls }) => {
     toast("Link copied to clipboard!");
   };
 
+  const isExtension =
+    window.location.origin.includes("chrome-extension") ||
+    window.location.origin.includes("moz-extension");
+
   const deleteURLHandler = async (id) => {
     const resp = await fetch(backendURL + "/api/url", {
       method: "DELETE",
@@ -104,7 +108,18 @@ const URLsTable = ({ urls, setUrls }) => {
                   <Td textAlign="center">{url.visitHistory.length}</Td>
                   <Td textAlign="center">{url.createdAt.substring(0, 10)}</Td>
                   <Td textAlign="center">
-                    <Link to={`/analytics/${url.shortURL}`}>view</Link>
+                    {isExtension ? (
+                      <Link
+                        href={`${frontendURL}/analytics/${url.shortURL}`}
+                        target="_blank"
+                        color="blue"
+                        _hover={{ textDecoration: "none" }}
+                      >
+                        view
+                      </Link>
+                    ) : (
+                      <Link to={`/analytics/${url.shortURL}`}>view</Link>
+                    )}
                   </Td>
                   <Td p={0}>
                     <AiOutlineDelete

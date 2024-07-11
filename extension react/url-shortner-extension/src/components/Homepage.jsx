@@ -8,10 +8,17 @@ import {
   InputGroup,
   InputLeftElement,
   InputRightElement,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
   Text,
+  useDisclosure,
 } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
-import URLsTable from "./URLsTable";
 import { HiLink } from "react-icons/hi";
 import { backendURL, frontendURL } from "../constants";
 import { Link } from "react-router-dom";
@@ -24,6 +31,7 @@ const Homepage = () => {
   const urlToShort = useRef(null);
   const [shortURL, setShortURL] = useState("");
   const [showPopup, setShowPopup] = useState({});
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const { user } = useAuthContext();
   const isExtension =
@@ -48,6 +56,7 @@ const Homepage = () => {
   const handleUploadURLToShort = async (e) => {
     e.preventDefault();
     const url = urlToShort.current.value;
+
     if (!user?.token) return;
     const response = await fetch(backendURL + "/api/url", {
       method: "POST",
@@ -62,6 +71,7 @@ const Homepage = () => {
     if (response.status === 400) {
       toast(data?.resp, { type: "error" });
       if (data?.popup) {
+        onOpen();
         setShowPopup(data);
       }
       return;
@@ -75,58 +85,47 @@ const Homepage = () => {
   return (
     <Box m={isExtension ? 0 : 30}>
       {showPopup?.resp && (
-        <Flex
-          height="100vh"
-          width="100vw"
-          zIndex={100}
-          position="fixed"
-          top="0"
-          left="0"
-          alignItems="center"
-          justifyContent="center"
-          bg="rgba(0, 0, 0, 0.7)"
-          backdropFilter="blur(4px)"
-        >
-          <Box
-            p={6}
-            bg="white"
-            borderRadius="lg"
-            boxShadow="lg"
-            maxWidth="400px"
-            textAlign="center"
-          >
-            <Heading size="lg" mb={4}>
-              {showPopup.popupText}
-            </Heading>
-            <Text mb={4}>{showPopup.message}</Text>
-            <Button
-              onClick={() => setShowPopup(null)}
-              colorScheme="red"
-              mt={2}
-              width="full"
-            >
-              Close
-            </Button>
-            {isExtension ? (
-              <Link
-                href={frontendURL + "/premium"}
-                target="_blank"
-                color="blue"
-                _hover={{ textDecoration: "none" }}
-              >
-                <Button colorScheme="blue" mt={2} width="full">
-                  Buy Premium
+        <>
+          <Modal isOpen={isOpen} onClose={onClose} isCentered>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>{showPopup.popupText}</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>{showPopup.message}</ModalBody>
+
+              <ModalFooter>
+                <Button
+                  colorScheme="red"
+                  mr={3}
+                  onClick={() => {
+                    onClose();
+                    setShowPopup(null);
+                  }}
+                >
+                  Close
                 </Button>
-              </Link>
-            ) : (
-              <Link to="/premium">
-                <Button colorScheme="blue" mt={2} width="full">
-                  Buy Premium
-                </Button>
-              </Link>
-            )}
-          </Box>
-        </Flex>
+                {isExtension ? (
+                  <Link
+                    href={frontendURL + "/premium"}
+                    target="_blank"
+                    color="blue"
+                    _hover={{ textDecoration: "none" }}
+                  >
+                    <Button colorScheme="blue" mt={2} width="full">
+                      Buy Premium
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link to="/premium">
+                    <Button colorScheme="blue" mt={2} width="full">
+                      Buy Premium
+                    </Button>
+                  </Link>
+                )}
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+        </>
       )}
 
       <Center>
@@ -169,6 +168,7 @@ const Homepage = () => {
                 type="url"
                 w={{ base: "80vw", md: "50vw" }}
                 ref={urlToShort}
+                required
               />
               <InputRightElement width="8.5rem">
                 <Button h="2.5rem" size="sm" type="submit">
