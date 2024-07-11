@@ -109,14 +109,13 @@ const URLsTable = ({ urls, setUrls }) => {
                   <Td textAlign="center">{url.createdAt.substring(0, 10)}</Td>
                   <Td textAlign="center">
                     {isExtension ? (
-                      <Link
+                      <a
                         href={`${frontendURL}/analytics/${url.shortURL}`}
                         target="_blank"
-                        color="blue"
-                        _hover={{ textDecoration: "none" }}
+                        style={{ color: "blue" }}
                       >
                         view
-                      </Link>
+                      </a>
                     ) : (
                       <Link to={`/analytics/${url.shortURL}`}>view</Link>
                     )}

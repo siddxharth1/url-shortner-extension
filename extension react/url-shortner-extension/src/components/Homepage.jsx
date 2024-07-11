@@ -21,7 +21,7 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { HiLink } from "react-icons/hi";
 import { backendURL, frontendURL } from "../constants";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -32,6 +32,7 @@ const Homepage = () => {
   const [shortURL, setShortURL] = useState("");
   const [showPopup, setShowPopup] = useState({});
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const navigate = useNavigate();
 
   const { user } = useAuthContext();
   const isExtension =
@@ -67,6 +68,15 @@ const Homepage = () => {
       body: JSON.stringify({ url }),
     });
 
+    if (response.status === 401) {
+      toast("Please login to shorten the URL", { type: "error" });
+      //remove user from cookies
+      document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+      navigate("/login");
+      return;
+    }
+
     const data = await response.json();
     if (response.status === 400) {
       toast(data?.resp, { type: "error" });
@@ -76,8 +86,9 @@ const Homepage = () => {
       }
       return;
     }
-    setShortURL(data.resp);
     console.log(data);
+
+    setShortURL(data.resp);
     toast("URL Shortned Successfully!");
 
     urlToShort.current.value = "";
@@ -105,7 +116,7 @@ const Homepage = () => {
                   Close
                 </Button>
                 {isExtension ? (
-                  <Link
+                  <a
                     href={frontendURL + "/premium"}
                     target="_blank"
                     color="blue"
@@ -114,7 +125,7 @@ const Homepage = () => {
                     <Button colorScheme="blue" mt={2} width="full">
                       Buy Premium
                     </Button>
-                  </Link>
+                  </a>
                 ) : (
                   <Link to="/premium">
                     <Button colorScheme="blue" mt={2} width="full">
