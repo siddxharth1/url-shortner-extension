@@ -61,14 +61,16 @@ const handleDeleteURL = async (req, res) => {
 };
 
 const handleGetRedirectURL = async (req, res) => {
+  console.log("ip address ");
   const { id } = req.params;
+  console.log("ip" + req.ips);
   let clientIp = req.clientIp === "::1" ? "114.70.50.193" : req.clientIp;
   console.log(clientIp);
   let ipData = null;
 
   try {
     const response = await fetch(
-      `https://api.ipgeolocation.io/ipgeo?apiKey=${process.env.IPGEOLOCATION_API_KEY}&ip=114.70.50.193`
+      `https://api.ipgeolocation.io/ipgeo?apiKey=${process.env.IPGEOLOCATION_API_KEY}&ip=${clientIp}`
     );
     ipData = await response.json();
     // console.log(ipData);

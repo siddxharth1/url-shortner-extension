@@ -41,7 +41,7 @@ const Navbar = () => {
             variant={"link"}
             cursor={"pointer"}
           >
-            <Avatar src={"https://bit.ly/ryan-florence"} />
+            <Avatar />
           </MenuButton>
           <MenuList p={2}>
             {user && (
