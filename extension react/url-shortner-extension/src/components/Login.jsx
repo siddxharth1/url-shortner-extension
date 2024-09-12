@@ -77,6 +77,7 @@ const Login = () => {
                   type="email"
                   ref={email}
                   placeholder="example@gmail.com"
+                  defaultValue={"jiwitod541@bsidesmn.com"}
                 />
               </FormControl>
 
@@ -86,6 +87,7 @@ const Login = () => {
                   <Input
                     type={showPassword ? "text" : "password"}
                     placeholder="password"
+                    defaultValue={"jiwitod541@bsidesmn.com"}
                     ref={password}
                   />
                   <InputRightElement>

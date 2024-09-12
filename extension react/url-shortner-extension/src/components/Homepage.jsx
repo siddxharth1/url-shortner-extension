@@ -33,6 +33,7 @@ const Homepage = () => {
   const [showPopup, setShowPopup] = useState({});
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const { user } = useAuthContext();
   const isExtension =
@@ -55,6 +56,7 @@ const Homepage = () => {
   }, []);
 
   const handleUploadURLToShort = async (e) => {
+    setLoading(true);
     e.preventDefault();
     const url = urlToShort.current.value;
 
@@ -92,76 +94,77 @@ const Homepage = () => {
     toast("URL Shortned Successfully!");
 
     urlToShort.current.value = "";
+    setLoading(false);
   };
   return (
-    <Box m={isExtension ? 0 : 30}>
+    <Box
+      m={isExtension ? 0 : 4}
+      p={!isExtension && 4}
+      py={isExtension && 2}
+      minH="30vh"
+    >
       {showPopup?.resp && (
-        <>
-          <Modal isOpen={isOpen} onClose={onClose} isCentered>
-            <ModalOverlay />
-            <ModalContent>
-              <ModalHeader>{showPopup.popupText}</ModalHeader>
-              <ModalCloseButton />
-              <ModalBody>{showPopup.message}</ModalBody>
-
-              <ModalFooter>
-                <Button
-                  colorScheme="red"
-                  mr={3}
-                  onClick={() => {
-                    onClose();
-                    setShowPopup(null);
-                  }}
+        <Modal isOpen={isOpen} onClose={onClose} isCentered>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader fontSize="lg">{showPopup.popupText}</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody fontSize="md">{showPopup.message}</ModalBody>
+            <ModalFooter>
+              <Button
+                colorScheme="red"
+                size="sm"
+                onClick={() => {
+                  onClose();
+                  setShowPopup(null);
+                }}
+              >
+                Close
+              </Button>
+              {isExtension ? (
+                <a
+                  href={frontendURL + "/premium"}
+                  target="_blank"
+                  style={{ textDecoration: "none", marginLeft: "1rem" }}
                 >
-                  Close
-                </Button>
-                {isExtension ? (
-                  <a
-                    href={frontendURL + "/premium"}
-                    target="_blank"
-                    color="blue"
-                    _hover={{ textDecoration: "none" }}
-                  >
-                    <Button colorScheme="blue" mt={2} width="full">
-                      Buy Premium
-                    </Button>
-                  </a>
-                ) : (
-                  <Link to="/premium">
-                    <Button colorScheme="blue" mt={2} width="full">
-                      Buy Premium
-                    </Button>
-                  </Link>
-                )}
-              </ModalFooter>
-            </ModalContent>
-          </Modal>
-        </>
+                  <Button colorScheme="blue" size="sm">
+                    Buy Premium
+                  </Button>
+                </a>
+              ) : (
+                <Link to="/premium" style={{ marginLeft: "1rem" }}>
+                  <Button colorScheme="blue" size="sm">
+                    Buy Premium
+                  </Button>
+                </Link>
+              )}
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
       )}
 
-      <Center>
+      <Center m={0}>
         <Flex flexDirection="column" alignItems="center">
-          <Text
-            style={{
-              fontWeight: "bolder",
-              fontSize: !isExtension ? "2rem" : "1.5rem",
-            }}
-            textAlign="center"
-          >
-            Short Your looooooong URL
-          </Text>
-          {!isExtension && (
-            <Text w="80vw" maxW="700px" textAlign="center">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem,
-              eveniet! Dolore odio similique error consequatur hic harum ipsum
-              nobis nam?
-            </Text>
-          )}
-
           {!isExtension && (
             <>
-              <br />
-              <br />
+              <Text
+                fontWeight="bold"
+                fontSize={isExtension ? "1.5rem" : "2rem"}
+                textAlign={!isExtension && "center"}
+              >
+                Short Your Long URL
+              </Text>
+
+              <Text
+                w="80vw"
+                maxW="500px"
+                textAlign="center"
+                mt={2}
+                fontSize="sm"
+              >
+                Easily shorten your long URLs with this tool. Simply enter your
+                URL below and hit "Shorten URL" to generate a shorter link.
+              </Text>
             </>
           )}
 
@@ -182,25 +185,27 @@ const Homepage = () => {
                 required
               />
               <InputRightElement width="8.5rem">
-                <Button h="2.5rem" size="sm" type="submit">
+                <Button h="2.5rem" size="sm" type="submit" isLoading={loading}>
                   Shortner URL
                 </Button>
               </InputRightElement>
             </InputGroup>
           </form>
+
           {shortURL && (
-            <Text mt={3} fontSize="lg">
+            <Text mt={3} fontSize="sm">
               Short URL:{" "}
-              <Link color={"blue"}>{backendURL + "/" + shortURL.shortURL}</Link>
+              <a
+                style={{ color: "blue" }}
+                target="_blank"
+                href={frontendURL + "/" + shortURL.shortURL}
+              >
+                {frontendURL + "/" + shortURL.shortURL}
+              </a>
             </Text>
           )}
         </Flex>
       </Center>
-      <ToastContainer
-        progressStyle={{
-          background: "green",
-        }}
-      />
     </Box>
   );
 };
